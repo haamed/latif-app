@@ -48,7 +48,9 @@ export class UsersService {
   }
 
   private sanitizeUser<T extends { password?: string }>(user: T) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...rest } = user;
+    // TODO validate password
     return rest;
   }
 }

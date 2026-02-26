@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -15,16 +11,6 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
-
-  private sanitizeUser(user: { password?: string }) {
-    const { password, ...rest } = user;
-    return rest;
-  }
-
-  private signToken(user: { id: number; email: string }) {
-    const payload = { sub: user.id, email: user.email };
-    return this.jwtService.sign(payload);
-  }
 
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
@@ -66,6 +52,19 @@ export class AuthService {
     });
     const accessToken = this.signToken(user);
     return { accessToken, user: this.sanitizeUser(user) };
+  }
+
+  private sanitizeUser(user: { password?: string }) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...rest } = user;
+    // TODO validate password
+
+    return rest;
+  }
+
+  private signToken(user: { id: number; email: string }) {
+    const payload = { sub: user.id, email: user.email };
+    return this.jwtService.sign(payload);
   }
 }
 
