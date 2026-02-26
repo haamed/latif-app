@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from './auth.service';
 
@@ -22,10 +22,8 @@ import { AuthService } from './auth.service';
   ],
 })
 export class AuthCallbackComponent implements OnInit {
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly auth: AuthService,
-  ) {}
+  private readonly route = inject(ActivatedRoute);
+  private readonly auth = inject(AuthService);
 
   ngOnInit(): void {
     const token = this.route.snapshot.queryParamMap.get('token');
