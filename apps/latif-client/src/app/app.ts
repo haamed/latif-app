@@ -15,6 +15,10 @@ export class App {
   protected title = 'latif-client';
   protected auth = inject(AuthService);
 
+  protected get currentUser() {
+    return this.auth.getCurrentUser();
+  }
+
   protected logout() {
     this.auth.logout();
   }

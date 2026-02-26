@@ -5,6 +5,13 @@ import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
+export type GoogleProfile = {
+  email: string;
+  name?: string;
+  googleId: string;
+  picture?: string;
+};
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -14,7 +21,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) {
+    if (!user || !user.password) {
       throw new UnauthorizedException('Invalid credentials');
     }
     const match = await bcrypt.compare(password, user.password);
@@ -28,7 +35,7 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: loginDto.email },
     });
-    if (!user) {
+    if (!user || !user.password) {
       throw new UnauthorizedException('Invalid credentials');
     }
     const match = await bcrypt.compare(loginDto.password, user.password);
@@ -48,17 +55,41 @@ export class AuthService {
     }
     const hashed = await bcrypt.hash(registerDto.password, 10);
     const user = await this.prisma.user.create({
-      data: { ...registerDto, password: hashed },
+      data: { ...registerDto, password: hashed, provider: 'local' },
     });
     const accessToken = this.signToken(user);
     return { accessToken, user: this.sanitizeUser(user) };
   }
 
-  private sanitizeUser(user: { password?: string }) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...rest } = user;
-    // TODO validate password
+  async googleLogin(profile: GoogleProfile) {
+    if (!profile.email) {
+      throw new UnauthorizedException('Google account has no email');
+    }
 
+    const user = await this.prisma.user.upsert({
+      where: { email: profile.email },
+      update: {
+        name: profile.name ?? undefined,
+        googleId: profile.googleId,
+        picture: profile.picture ?? undefined,
+        provider: 'google',
+      },
+      create: {
+        email: profile.email,
+        name: profile.name,
+        googleId: profile.googleId,
+        picture: profile.picture,
+        provider: 'google',
+      },
+    });
+
+    const accessToken = this.signToken(user);
+    return { accessToken, user: this.sanitizeUser(user) };
+  }
+
+  private sanitizeUser(user: { password?: string; googleId?: string }) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, googleId, ...rest } = user;
     return rest;
   }
 
@@ -67,4 +98,3 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 }
-

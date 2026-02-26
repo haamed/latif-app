@@ -8,6 +8,9 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  declare $connect: PrismaClient['$connect'];
+  declare $disconnect: PrismaClient['$disconnect'];
+  // declare user: PrismaClient['user'];
   private pool: Pool;
 
   constructor() {
@@ -15,6 +18,11 @@ export class PrismaService
     const adapter = new PrismaPg(pool);
     super({ adapter });
     this.pool = pool;
+  }
+
+  // Surface generated model delegate so downstream services see it
+  get user(): PrismaClient['user'] {
+    return super.user;
   }
 
   async onModuleInit() {

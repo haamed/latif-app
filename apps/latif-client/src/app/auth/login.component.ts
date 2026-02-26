@@ -38,6 +38,9 @@ import { AuthService } from './auth.service';
           {{ loading ? 'Signing in...' : 'Login' }}
         </button>
       </form>
+      <button type="button" class="google" (click)="onGoogle()">
+        Continue with Google
+      </button>
       @if (error) {
         <p class="error">{{ error }}</p>
       }
@@ -65,6 +68,12 @@ import { AuthService } from './auth.service';
       button {
         width: 100%;
         padding: 10px;
+      }
+      button.google {
+        margin-top: 8px;
+        background: #fff;
+        color: #444;
+        border: 1px solid #ccc;
       }
       .error {
         color: #c00;
@@ -114,5 +123,11 @@ export class LoginComponent {
           this.cdr.markForCheck();
         },
       });
+  }
+
+  onGoogle() {
+    const returnUrl =
+      this.route.snapshot.queryParamMap.get('returnUrl') || undefined;
+    this.auth.startGoogleLogin(returnUrl);
   }
 }

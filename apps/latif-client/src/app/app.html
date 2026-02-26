@@ -1,5 +1,8 @@
 <nav class="top-nav">
   <a routerLink="/users">Users</a>
+  @if (currentUser) {
+    <span class="user-label">Logged in as {{ currentUser.email }}</span>
+  }
   @if (auth.isAuthenticated()) {
     <button (click)="logout()" type="button">Logout</button>
   }
