@@ -2,37 +2,53 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma.service';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.prisma.user.create({
-      data: createUserDto,
+  async create(createUserDto: CreateUserDto) {
+    const hashed = await bcrypt.hash(createUserDto.password, 10);
+    const user = await this.prisma.user.create({
+      data: { ...createUserDto, password: hashed },
     });
+    return this.sanitizeUser(user);
   }
 
-  findAll() {
-    return this.prisma.user.findMany();
+  async findAll() {
+    const users = await this.prisma.user.findMany();
+    return users.map((u) => this.sanitizeUser(u));
   }
 
-  findOne(id: number) {
-    return this.prisma.user.findUnique({
+  async findOne(id: number) {
+    const user = await this.prisma.user.findUnique({
       where: { id },
     });
+    return user ? this.sanitizeUser(user) : null;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const data = { ...updateUserDto } as UpdateUserDto & { password?: string };
+    if (updateUserDto.password) {
+      data.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+    const user = await this.prisma.user.update({
       where: { id },
-      data: updateUserDto,
+      data,
     });
+    return this.sanitizeUser(user);
   }
 
-  remove(id: number) {
-    return this.prisma.user.delete({
+  async remove(id: number) {
+    const user = await this.prisma.user.delete({
       where: { id },
     });
+    return this.sanitizeUser(user);
+  }
+
+  private sanitizeUser<T extends { password?: string }>(user: T) {
+    const { password, ...rest } = user;
+    return rest;
   }
 }
