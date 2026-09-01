@@ -1,0 +1,17 @@
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #f7f7f7;
+}
+
+.user-label {
+  margin-left: auto;
+  color: #444;
+}
+
+.top-nav button {
+  margin-left: 4px;
+}
+

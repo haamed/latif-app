@@ -14,9 +14,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {
-      "@prisma/client": ["./node_modules/@prisma/client"]
-    }
+    "paths": {}
   },
   "exclude": ["node_modules", "tmp"]
 }
