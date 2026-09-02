@@ -1,22 +1,38 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ProgressSpinner } from 'primeng/progressspinner';
 import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-auth-callback',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [ProgressSpinner, TranslatePipe],
   template: `
     <div class="callback">
-      <p>Finishing sign-in...</p>
+      <p-progressspinner
+        strokeWidth="4"
+        styleClass="callback__spinner"
+        ariaLabel="Signing in"
+      />
+      <p>{{ 'authCallback.finishing' | translate }}</p>
     </div>
   `,
   styles: [
     `
       .callback {
-        text-align: center;
-        margin-top: 40px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        color: var(--p-surface-500);
+      }
+
+      :host ::ng-deep .callback__spinner {
+        width: 3rem;
+        height: 3rem;
       }
     `,
   ],

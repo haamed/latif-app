@@ -1,1 +1,33 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles */
+@import 'primeicons/primeicons.css';
+
+:root {
+    --app-font: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: var(--app-font);
+    background: var(--p-surface-50);
+    color: var(--p-surface-900);
+}
+
+html.app-dark,
+html.app-dark body {
+    background: var(--p-surface-950);
+    color: var(--p-surface-0);
+}
+
+a {
+    color: inherit;
+}
+
+.w-full {
+    width: 100%;
+}

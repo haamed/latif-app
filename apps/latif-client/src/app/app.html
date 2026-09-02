@@ -1,10 +1,38 @@
-<nav class="top-nav">
-  <a routerLink="/users">Users</a>
-  @if (currentUser) {
-    <span class="user-label">Logged in as {{ currentUser.email }}</span>
-  }
-  @if (auth.isAuthenticated()) {
-    <button (click)="logout()" type="button">Logout</button>
-  }
-</nav>
-<router-outlet></router-outlet>
+<p-toast />
+<p-confirmdialog />
+
+@if (auth.isAuthenticated()) {
+<header class="topbar">
+  <div class="topbar__inner">
+    <a routerLink="/users" class="topbar__brand">
+      <span class="topbar__brand-mark"><i class="pi pi-compass"></i></span>
+      <span class="topbar__brand-text">{{ 'app.name' | translate }}</span>
+    </a>
+
+    <nav class="topbar__nav">
+      <a routerLink="/users" routerLinkActive="topbar__link--active" class="topbar__link">
+        <i class="pi pi-users"></i>
+        <span>{{ 'nav.users' | translate }}</span>
+      </a>
+      <a routerLink="/people" routerLinkActive="topbar__link--active" class="topbar__link">
+        <i class="pi pi-address-book"></i>
+        <span>{{ 'nav.people' | translate }}</span>
+      </a>
+    </nav>
+
+    <div class="topbar__user">
+      <p-select [options]="languageService.languages" optionLabel="label" optionValue="code"
+        [ngModel]="languageService.current.code" (ngModelChange)="languageService.setLanguage($event)"
+        [ariaLabel]="'nav.language' | translate" styleClass="topbar__lang-select" />
+      <span class="topbar__email">{{ currentUser?.email }}</span>
+      <p-avatar [label]="userInitials" shape="circle" styleClass="topbar__avatar" />
+      <p-button icon="pi pi-sign-out" [text]="true" severity="secondary" size="small"
+        [pTooltip]="'nav.logout' | translate" tooltipPosition="bottom" (onClick)="logout()" />
+    </div>
+  </div>
+</header>
+}
+
+<main class="app-shell" [class.app-shell--bare]="!auth.isAuthenticated()">
+  <router-outlet></router-outlet>
+</main>
